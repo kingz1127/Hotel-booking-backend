@@ -1,0 +1,64 @@
+# Application Configuration
+spring.application.name=hotel-booking-system-backend
+
+# Server Configuration
+server.port=8080
+server.servlet.context-path=/
+
+# H2 Database Configuration
+spring.datasource.url=jdbc:h2:mem:hoteldb
+spring.datasource.driverClassName=org.h2.Driver
+spring.datasource.username=sa
+spring.datasource.password=
+
+spring.h2.console.enabled=true
+spring.h2.console.path=/h2-console
+spring.h2.console.settings.trace=false
+spring.h2.console.settings.web-allow-others=false
+
+# JPA Configuration
+spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+spring.jpa.properties.hibernate.jdbc.batch_size=10
+spring.jpa.properties.hibernate.order_inserts=true
+spring.jpa.properties.hibernate.order_updates=true
+
+# CORS Configuration
+spring.web.cors.allowed-origins=http://localhost:3000,http://localhost:5173
+spring.web.cors.allowed-methods=GET,POST,PUT,DELETE,OPTIONS,PATCH
+spring.web.cors.allowed-headers=*
+spring.web.cors.allow-credentials=true
+spring.web.cors.max-age=3600
+
+# Email Configuration (example only)
+spring.mail.host=smtp.gmail.com
+spring.mail.port=465
+spring.mail.username=your_email@gmail.com
+spring.mail.password=your_app_password
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.ssl.enable=true
+spring.mail.properties.mail.smtp.ssl.trust=smtp.gmail.com
+spring.mail.properties.mail.smtp.connectiontimeout=10000
+spring.mail.properties.mail.smtp.timeout=10000
+spring.mail.properties.mail.smtp.writetimeout=10000
+
+# Super Admin Credentials (example only)
+super.admin.username=superadmin
+super.admin.password=change_me
+
+# Jackson Configuration
+spring.jackson.serialization.write-dates-as-timestamps=false
+spring.jackson.serialization.indent-output=true
+spring.jackson.default-property-inclusion=non_null
+spring.jackson.deserialization.fail-on-unknown-properties=false
+
+# Security Configuration (disabled for development)
+spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+
+# Logging Configuration
+logging.level.com.example.hotel_booking_system_backend=DEBUG
+logging.level.org.springframework.web=INFO
+logging.level.org.hibernate.SQL=DEBUG
+logging.level.org.hibernate.type.descriptor.sql.BasicBinder=TRACE
