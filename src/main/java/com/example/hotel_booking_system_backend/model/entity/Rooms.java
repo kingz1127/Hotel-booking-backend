@@ -1,17 +1,19 @@
 package com.example.hotel_booking_system_backend.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 @Entity
 @Table(name = "rooms")
-
 public class Rooms {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    private int id;
     private String roomName;
     private String roomDescription;
     private double roomDiscount;
@@ -21,6 +23,26 @@ public class Rooms {
     private int roomMeasurements;
     private int roomBeds;
     private int roomBaths;
+
+    @Lob
+    @Column(columnDefinition = "MEDIUMBLOB")
+    private String roomImage;
+
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Booking> bookings;
+
+    // Fix the getId() method - should return Long, not long
+    public Long getId() {
+        return id;
+    }
+
+    // Fix the setId() method - should accept Long
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    // ... keep all your other getters and setters ...
 
     public String getRoomImage() {
         return roomImage;
@@ -102,15 +124,11 @@ public class Rooms {
         this.roomName = roomName;
     }
 
-    public int getId() {
-        return id;
+    public List<Booking> getBookings() {
+        return bookings;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setBookings(List<Booking> bookings) {
+        this.bookings = bookings;
     }
-
-    @Lob
-    @Column(columnDefinition = "MEDIUMBLOB")
-    private String roomImage;
 }

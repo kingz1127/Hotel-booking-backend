@@ -1,6 +1,9 @@
 package com.example.hotel_booking_system_backend.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+
+import java.util.List;
 
 @Entity
 @Table(name = "UserRegistration")
@@ -40,7 +43,7 @@ public class UserRegister {
         this.email = email;
     }
 
-    public String getPhoneNmber() {
+    public String getPhoneNumber() {
         return phoneNumber;
     }
 
@@ -62,5 +65,18 @@ public class UserRegister {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Booking> bookings;
+
+    // Add getter and setter
+    public List<Booking> getBookings() {
+        return bookings;
+    }
+
+    public void setBookings(List<Booking> bookings) {
+        this.bookings = bookings;
     }
 }

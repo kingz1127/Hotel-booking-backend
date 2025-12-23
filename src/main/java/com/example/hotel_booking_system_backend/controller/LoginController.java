@@ -26,8 +26,9 @@ public class LoginController {
             UserRegister responseUser = new UserRegister();
             responseUser.setId(newUser.getId());
             responseUser.setFullName(newUser.getFullName());
-            responseUser.setPhoneNumber(newUser.getPhoneNmber());
+            responseUser.setPhoneNumber(newUser.getPhoneNumber());
             responseUser.setAddress(newUser.getAddress());
+            responseUser.setEmail(newUser.getEmail()); // ← ADD THIS SINGLE LINE!
 
             return ResponseEntity.ok(responseUser);
         } catch (RuntimeException e) {

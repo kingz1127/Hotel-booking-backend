@@ -14,10 +14,10 @@ public class BeanConfig {
     public ObjectMapper objectMapper(Jackson2ObjectMapperBuilder builder) {
         ObjectMapper objectMapper = builder.createXmlMapper(false).build();
 
-        // Add Java 8 Time support
+
         objectMapper.registerModule(new JavaTimeModule());
 
-        // Configure to ignore unknown properties
+
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         objectMapper.configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false);
 

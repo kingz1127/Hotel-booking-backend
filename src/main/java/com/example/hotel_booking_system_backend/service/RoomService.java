@@ -59,7 +59,7 @@ public class RoomService {
     }
 
     public Rooms getRoomById(int id){
-        Optional<Rooms> optional = roomsRepository.findById(id);
+        Optional<Rooms> optional = roomsRepository.findById((long) id);
 
         if (optional.isEmpty()){
             throw new RuntimeException("Room not found");
@@ -69,7 +69,7 @@ public class RoomService {
 
     public Rooms update(int id, CreateRooms createRooms, MultipartFile multipartFile) {
         // First, find the existing room
-        Optional<Rooms> optionalRoom = roomsRepository.findById(id);
+        Optional<Rooms> optionalRoom = roomsRepository.findById((long) id);
 
         if (optionalRoom.isEmpty()) {
             throw new RuntimeException("Room with id " + id + " not found");
@@ -106,9 +106,9 @@ public class RoomService {
 
 
     public void delete(int id) {
-        if (!roomsRepository.existsById(id)) {
+        if (!roomsRepository.existsById((long) id)) {
             throw new RuntimeException("Room with id " + id + " not found");
         }
-        roomsRepository.deleteById(id);
+        roomsRepository.deleteById((long) id);
     }
 }
