@@ -46,19 +46,18 @@ public class LoginService {
         }
             if (userOptional.isPresent()) {
                 UserRegister user = userOptional.get();
-                System.out.println("Found user details:");
-                System.out.println("  Email in DB: '" + user.getEmail() + "'");
-                System.out.println("  Password in DB: '" + user.getPassword() + "'");
-                System.out.println("  Password length in DB: " + user.getPassword().length());
-                System.out.println("  Password provided: '" + loginRequest.getPassword() + "'");
-                System.out.println("  Password provided length: " + loginRequest.getPassword().length());
+//                System.out.println("Found user details:");
+//                System.out.println("  Email in DB: '" + user.getEmail() + "'");
+//                System.out.println("  Password in DB: '" + user.getPassword() + "'");
+//                System.out.println("  Password length in DB: " + user.getPassword().length());
+//                System.out.println("  Password provided: '" + loginRequest.getPassword() + "'");
+//                System.out.println("  Password provided length: " + loginRequest.getPassword().length());
 
-                // Compare passwords exactly
                 boolean passwordMatches = user.getPassword().equals(loginRequest.getPassword());
                 System.out.println("Password match result: " + passwordMatches);
 
                 if (!passwordMatches) {
-                    // Debug character by character
+
                     System.out.println("=== PASSWORD DEBUG ===");
                     String dbPass = user.getPassword();
                     String providedPass = loginRequest.getPassword();
@@ -73,7 +72,7 @@ public class LoginService {
                         System.out.println("  [" + i + "]: '" + providedPass.charAt(i) + "' (code: " + (int) providedPass.charAt(i) + ")");
                     }
 
-                    // Check if it's a substring issue
+
                     if (dbPass.contains(providedPass)) {
                         System.out.println("Provided password is a SUBSTRING of DB password!");
                     }

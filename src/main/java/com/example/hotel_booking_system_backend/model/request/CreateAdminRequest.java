@@ -9,22 +9,22 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CreateAdminRequest {
 
-    private String username; // Make optional
+    private String username;
 
     @NotBlank(message = "Email is required")
     @Email(message = "Email should be valid")
     private String email;
 
-    private String password; // Make optional (will be generated)
+    private String password;
 
     private String firstName;
     private String lastName;
     private String fullName;
     private String phoneNumber;
-    private String role = "ADMIN"; // Default to ADMIN
+    private String role = "ADMIN";
     private List<String> permissions;
 
-    // Getters and Setters
+
     public String getUsername() {
         if (username == null || username.trim().isEmpty()) {
             return email != null ? email.split("@")[0] : null;

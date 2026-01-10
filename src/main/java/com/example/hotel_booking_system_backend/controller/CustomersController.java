@@ -15,7 +15,7 @@ import java.util.List;
 public class CustomersController {
 
     @Autowired
-    private CustomerService customerService; // Fixed variable name
+    private CustomerService customerService;
 
     @GetMapping
     public ResponseEntity<List<UserRegister>> getAllCustomers() {

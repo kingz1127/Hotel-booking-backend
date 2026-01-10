@@ -1,17 +1,25 @@
 package com.example.hotel_booking_system_backend.controller;
 
+import com.example.hotel_booking_system_backend.model.entity.Booking;
+import com.example.hotel_booking_system_backend.model.entity.UserRegister;
 import com.example.hotel_booking_system_backend.model.request.CreateAdminRequest;
 import com.example.hotel_booking_system_backend.model.request.AdminLoginRequest;
 import com.example.hotel_booking_system_backend.model.request.AdminVerificationRequest;
 import com.example.hotel_booking_system_backend.model.response.AdminResponse;
+import com.example.hotel_booking_system_backend.repository.BookingRepository;
+import com.example.hotel_booking_system_backend.repository.RegisterRepository;
 import com.example.hotel_booking_system_backend.service.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/admin")
@@ -21,35 +29,41 @@ public class AdminController {
     @Autowired
     private AdminService adminService;
 
-    // 1. GET /api/v1/admin/all - Get all admins
+    @Autowired
+    private BookingRepository bookingRepository;
+
+    @Autowired
+    private RegisterRepository registerRepository;
+
+
     @GetMapping("/all")
     public ResponseEntity<List<AdminResponse>> getAllAdmins() {
         List<AdminResponse> responses = adminService.getAllAdmins();
         return ResponseEntity.ok(responses);
     }
 
-    // 2. POST /api/v1/admin/create - Create new admin
+
     @PostMapping("/create")
     public ResponseEntity<AdminResponse> createAdmin(@RequestBody CreateAdminRequest request) {
         AdminResponse response = adminService.createAdmin(request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    // 3. POST /api/v1/admin/login/request - Send login code
+
     @PostMapping("/login/request")
     public ResponseEntity<?> requestLoginCode(@RequestBody AdminLoginRequest request) {
         try {
             String result = adminService.requestLoginCode(request.getEmail());
             return ResponseEntity.ok(result);
         } catch (RuntimeException e) {
-            // Return proper error for non-existent email
+
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 
-    // 4. POST /api/v1/admin/login/verify - Verify code
+
     @PostMapping("/login/verify")
     public ResponseEntity<?> verifyLoginCode(@RequestBody AdminVerificationRequest request) {
         try {
@@ -63,7 +77,7 @@ public class AdminController {
         }
     }
 
-    // 5. POST /api/v1/admin/resend-code/{adminId} - Resend code
+
     @PostMapping("/resend-code/{adminId}")
     public ResponseEntity<?> resendCode(@PathVariable Long adminId) {
         try {
@@ -76,18 +90,18 @@ public class AdminController {
         }
     }
 
-    // 6. DELETE /api/v1/admin/delete/{adminId} - Delete admin
+
     @DeleteMapping("/delete/{adminId}")
     public ResponseEntity<Void> deleteAdmin(@PathVariable Long adminId) {
         try {
             adminService.deleteAdmin(adminId);
             return ResponseEntity.noContent().build();
         } catch (RuntimeException e) {
-            throw e; // Let exception handler deal with it
+            throw e;
         }
     }
 
-    // 7. Additional endpoints for completeness
+
     @GetMapping("/{id}")
     public ResponseEntity<AdminResponse> getAdminById(@PathVariable Long id) {
         AdminResponse response = adminService.getAdminById(id);
@@ -102,7 +116,7 @@ public class AdminController {
         return ResponseEntity.ok(response);
     }
 
-    // 8. Add email validation endpoint (optional but recommended)
+
     @PostMapping("/check-email")
     public ResponseEntity<?> checkEmailExists(@RequestBody Map<String, String> request) {
         String email = request.get("email");
@@ -113,5 +127,65 @@ public class AdminController {
                 "email", email
         );
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/admin/fix-walkin-accounts")
+    public ResponseEntity<?> fixWalkInAccounts() {
+        try {
+            // Get all walk-in bookings without user accounts
+            List<Booking> walkInBookings = bookingRepository.findAll().stream()
+                    .filter(b -> b.getIsWalkIn() && b.getUser() == null &&
+                            b.getCustomerEmail() != null && !b.getCustomerEmail().trim().isEmpty())
+                    .collect(Collectors.toList());
+
+            int fixed = 0;
+            List<String> results = new ArrayList<>();
+
+            for (Booking booking : walkInBookings) {
+                String email = booking.getCustomerEmail().trim();
+
+                // Check if user already exists
+                Optional<UserRegister> existingUser = registerRepository.findByEmail(email);
+
+                if (existingUser.isPresent()) {
+                    // Link to existing user
+                    booking.setUser(existingUser.get());
+                    bookingRepository.save(booking);
+                    results.add("Linked booking #" + booking.getId() + " to existing user: " + email);
+                    fixed++;
+                } else {
+                    // Create new user account
+                    UserRegister newUser = new UserRegister();
+                    newUser.setFullName(booking.getCustomerName());
+                    newUser.setEmail(email);
+                    newUser.setPhoneNumber(booking.getCustomerPhone());
+                    newUser.setAddress("");
+                    newUser.setPassword("WALKIN_" + System.currentTimeMillis());
+                    newUser.setRole("CUSTOMER");
+                    newUser.setCreatedAt(LocalDateTime.now());
+                    newUser.setIsActive(true);
+
+                    UserRegister savedUser = registerRepository.save(newUser);
+
+                    // Link booking to new user
+                    booking.setUser(savedUser);
+                    bookingRepository.save(booking);
+
+                    results.add("Created user and linked booking #" + booking.getId() + ": " + email);
+                    fixed++;
+                }
+            }
+
+            return ResponseEntity.ok(Map.of(
+                    "fixed", fixed,
+                    "totalWalkIns", walkInBookings.size(),
+                    "details", results
+            ));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", e.getMessage()));
+        }
     }
 }

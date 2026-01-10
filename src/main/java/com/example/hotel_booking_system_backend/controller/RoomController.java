@@ -51,7 +51,7 @@ public class RoomController {
         return ResponseEntity.ok(rooms);
     }
 
-    // RoomController.java - Add this method
+
     @PutMapping(value = "/{id}")
     public ResponseEntity<?> updateRoom(
             @PathVariable("id") int id,

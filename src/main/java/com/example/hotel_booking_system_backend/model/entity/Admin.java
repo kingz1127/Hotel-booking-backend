@@ -17,8 +17,8 @@ public class Admin {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = false) // Required for database
-    private String password = "TEMP_PASSWORD"; // Default value to satisfy NOT NULL constraint
+    @Column(nullable = false)
+    private String password = "TEMP_PASSWORD";
 
     @Column(name = "full_name", nullable = false)
     private String fullName;
@@ -32,11 +32,11 @@ public class Admin {
     @Column(name = "is_active")
     private boolean active = true;
 
-    // Verification fields - FIXED naming
+
     @Column(name = "verification_code")
     private String verificationCode;
 
-    @Column(name = "code_expired_at") // Changed to match setter name
+    @Column(name = "code_expired_at")
     private LocalDateTime codeExpiredAt;
 
     @Column(name = "email_verified")
@@ -51,12 +51,12 @@ public class Admin {
     @Column(name = "last_login_at")
     private LocalDateTime lastLoginAt;
 
-    // Constructors
+
     public Admin() {
-        this.password = "TEMP_PASSWORD"; // Ensure password is never null
+        this.password = "TEMP_PASSWORD";
     }
 
-    // Getters and Setters - ALL FIXED
+
     public Long getId() {
         return id;
     }
@@ -121,7 +121,7 @@ public class Admin {
         this.active = active;
     }
 
-    // FIXED: Consistent naming for verification code
+
     public String getVerificationCode() {
         return verificationCode;
     }

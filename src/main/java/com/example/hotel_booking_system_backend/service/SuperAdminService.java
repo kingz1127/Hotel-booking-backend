@@ -14,21 +14,21 @@ public class SuperAdminService {
     @Value("${super.admin.password}")
     private String superAdminPassword;
 
-    // Validate super admin credentials
+
     public boolean validateSuperAdmin(String username, String password) {
         return superAdminUsername.equals(username) && superAdminPassword.equals(password);
     }
 
-    // Generate token (simplified - use JWT in production)
+
     public String generateSuperAdminToken(String username) {
-        // In production, use JWT
+
         return "super-admin-token-" + username + "-" + System.currentTimeMillis();
     }
 
     // Get system statistics
     public Map<String, Object> getSystemStats() {
         Map<String, Object> stats = new HashMap<>();
-        // Add your statistics logic here
+
         stats.put("totalAdmins", 5);
         stats.put("activeAdmins", 3);
         stats.put("pendingAdmins", 2);
@@ -39,10 +39,10 @@ public class SuperAdminService {
         return stats;
     }
 
-    // Get audit logs
+
     public Map<String, Object> getAuditLogs(int page, int size) {
         Map<String, Object> response = new HashMap<>();
-        // Add your audit log logic here
+
         response.put("page", page);
         response.put("size", size);
         response.put("total", 0);

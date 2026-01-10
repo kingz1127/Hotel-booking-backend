@@ -1,17 +1,10 @@
 package com.example.hotel_booking_system_backend.model.request;
 
-public class AdminVerificationRequest {
+// ResetPasswordRequest.java
+public class ResetPasswordRequest {
     private String email;
     private String code;
-
-
-    public AdminVerificationRequest() {}
-
-    public AdminVerificationRequest(String email, String code) {
-        this.email = email;
-        this.code = code;
-    }
-
+    private String newPassword;
 
     public String getEmail() {
         return email;
@@ -27,5 +20,13 @@ public class AdminVerificationRequest {
 
     public void setCode(String code) {
         this.code = code;
+    }
+
+    public String getNewPassword() {
+        return newPassword;
+    }
+
+    public void setNewPassword(String newPassword) {
+        this.newPassword = newPassword;
     }
 }

@@ -20,12 +20,12 @@ public class User {
     private LocalDateTime dateOfBirth;
 
     @Enumerated(EnumType.STRING)
-    private UserRole role; // SUPER_ADMIN, ADMIN, CUSTOMER
+    private UserRole role;
 
     private boolean isActive = true;
     private boolean emailVerified = false;
 
-    // For admin registration
+
     private String registrationCode;
     private LocalDateTime codeExpiry;
     private LocalDateTime codeGeneratedAt;

@@ -3,6 +3,7 @@ package com.example.hotel_booking_system_backend.model.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -18,6 +19,25 @@ public class UserRegister {
     private String phoneNumber;
     private String address;
     private String password;
+    private String role;
+    private LocalDateTime createdAt;
+    private Boolean isActive;
+
+    public String getRole() {
+        return role;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public Boolean getActive() {
+        return isActive;
+    }
+
+    public void setActive(Boolean active) {
+        isActive = active;
+    }
 
     public Long getId() {
         return id;
@@ -71,12 +91,24 @@ public class UserRegister {
     @JsonIgnore
     private List<Booking> bookings;
 
-    // Add getter and setter
+
     public List<Booking> getBookings() {
         return bookings;
     }
 
     public void setBookings(List<Booking> bookings) {
         this.bookings = bookings;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public void setIsActive(Boolean isActive) {
+        this.isActive = isActive;
     }
 }

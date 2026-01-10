@@ -17,7 +17,7 @@ public class SuperAdminController {
         this.superAdminService = superAdminService;
     }
 
-    // Super Admin Login
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> credentials) {
         String username = credentials.get("username");
@@ -32,7 +32,7 @@ public class SuperAdminController {
             ));
         }
 
-        // Generate token (you can use JWT here)
+
         String token = superAdminService.generateSuperAdminToken(username);
 
         return ResponseEntity.ok(Map.of(
@@ -42,7 +42,7 @@ public class SuperAdminController {
         ));
     }
 
-    // Get system statistics
+
     @GetMapping("/stats")
     @PreAuthorize("hasRole('SUPER_ADMIN')")
     public ResponseEntity<?> getSystemStats() {
@@ -50,7 +50,7 @@ public class SuperAdminController {
         return ResponseEntity.ok(stats);
     }
 
-    // Get audit logs
+
     @GetMapping("/audit-logs")
     @PreAuthorize("hasRole('SUPER_ADMIN')")
     public ResponseEntity<?> getAuditLogs(
@@ -59,7 +59,7 @@ public class SuperAdminController {
         return ResponseEntity.ok(superAdminService.getAuditLogs(page, size));
     }
 
-    // Verify super admin token
+
     @GetMapping("/verify")
     @PreAuthorize("hasRole('SUPER_ADMIN')")
     public ResponseEntity<?> verifyToken() {

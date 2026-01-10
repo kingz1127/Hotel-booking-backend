@@ -15,7 +15,7 @@ public class PaymentController {
     @Autowired
     private BookingService bookingService;
 
-    // Confirm payment for a booking
+
     @PostMapping("/{bookingId}/confirm")
     public ResponseEntity<BookingDTO> confirmPayment(@PathVariable Long bookingId) {
         try {
@@ -26,7 +26,7 @@ public class PaymentController {
         }
     }
 
-    // Cancel unpaid booking
+
     @PostMapping("/{bookingId}/cancel")
     public ResponseEntity<BookingDTO> cancelUnpaidBooking(@PathVariable Long bookingId) {
         try {
@@ -37,7 +37,7 @@ public class PaymentController {
         }
     }
 
-    // Check if booking is pending payment
+
     @GetMapping("/{bookingId}/status")
     public ResponseEntity<Boolean> checkPaymentStatus(@PathVariable Long bookingId) {
         try {
@@ -48,7 +48,7 @@ public class PaymentController {
         }
     }
 
-    // Get all pending payment bookings for a user
+
     @GetMapping("/user/{userId}/pending")
     public ResponseEntity<?> getPendingPaymentBookings(@PathVariable Long userId) {
         try {

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
 
@@ -49,18 +50,14 @@ public class AdminServiceImpl implements AdminService {
         admin.setActive(true);
         admin.setEmailVerified(false);
 
-        // Generate 8-digit verification code
+
         String verificationCode = String.format("%08d", new Random().nextInt(100000000));
         admin.setVerificationCode(verificationCode);
         admin.setCodeExpiredAt(LocalDateTime.now().plusHours(24));
 
-        System.out.println("=========================================");
-        System.out.println("Created admin: " + request.getEmail());
-        System.out.println("Generated username: " + username);
-        System.out.println("Generated verification code: " + verificationCode);
-        System.out.println("=========================================");
 
-        // Send email with verification code
+
+
         sendVerificationEmail(admin.getEmail(), admin.getFullName(), verificationCode);
 
         Admin savedAdmin = adminRepository.save(admin);
@@ -76,13 +73,13 @@ public class AdminServiceImpl implements AdminService {
             throw new RuntimeException("Admin account is inactive");
         }
 
-        // Generate a new 8-digit code
+
         String code = String.format("%08d", new Random().nextInt(100000000));
         admin.setVerificationCode(code);
         admin.setCodeExpiredAt(LocalDateTime.now().plusMinutes(15));
         adminRepository.save(admin);
 
-        // Send email with code
+
         sendLoginCodeEmail(admin.getEmail(), admin.getFullName(), code);
 
         return "Login code sent to " + email;
@@ -105,24 +102,24 @@ public class AdminServiceImpl implements AdminService {
             throw new RuntimeException("Verification code has expired");
         }
 
-        // Mark email as verified on first successful login
+
         if (!admin.isEmailVerified()) {
             admin.setEmailVerified(true);
         }
 
-        // Update last login
+
         admin.setLastLoginAt(LocalDateTime.now());
 
-        // Clear verification code after successful login
+
         admin.setVerificationCode(null);
         admin.setCodeExpiredAt(null);
 
         adminRepository.save(admin);
 
-        // Generate JWT token
+
         String token = generateSimpleToken(admin);
 
-        // Convert to response
+
         AdminResponse response = convertToResponse(admin);
         // MAKE SURE TO SET THE TOKEN
         response.setToken(token);
@@ -137,13 +134,13 @@ public class AdminServiceImpl implements AdminService {
         Admin admin = adminRepository.findById(adminId)
                 .orElseThrow(() -> new RuntimeException("Admin not found with id: " + adminId));
 
-        // Generate new code
+
         String code = String.format("%08d", new Random().nextInt(100000000));
         admin.setVerificationCode(code);
         admin.setCodeExpiredAt(LocalDateTime.now().plusMinutes(15));
         adminRepository.save(admin);
 
-        // Send email
+
         sendLoginCodeEmail(admin.getEmail(), admin.getFullName(), code);
 
         return "New code sent to " + admin.getEmail();
@@ -175,7 +172,7 @@ public class AdminServiceImpl implements AdminService {
         } catch (Exception e) {
             System.err.println("Failed to send verification email: " + e.getMessage());
             e.printStackTrace();
-            // Don't throw exception - admin creation should still succeed
+
         }
     }
 
@@ -270,6 +267,11 @@ public class AdminServiceImpl implements AdminService {
         Admin admin = adminRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Admin not found with email: " + email));
         return convertToResponse(admin);
+    }
+
+    @Override
+    public Optional<Admin> findById(Long adminId) {
+        return adminRepository.findById(adminId);
     }
 
     private AdminResponse convertToResponse(Admin admin) {

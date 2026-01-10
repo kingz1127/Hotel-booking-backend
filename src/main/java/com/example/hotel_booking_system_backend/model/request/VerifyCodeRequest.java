@@ -1,17 +1,9 @@
 package com.example.hotel_booking_system_backend.model.request;
 
-public class AdminVerificationRequest {
+// VerifyCodeRequest.java
+public class VerifyCodeRequest {
     private String email;
     private String code;
-
-
-    public AdminVerificationRequest() {}
-
-    public AdminVerificationRequest(String email, String code) {
-        this.email = email;
-        this.code = code;
-    }
-
 
     public String getEmail() {
         return email;

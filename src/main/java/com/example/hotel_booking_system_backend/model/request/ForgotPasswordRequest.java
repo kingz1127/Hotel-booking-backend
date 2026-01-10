@@ -1,16 +1,8 @@
 package com.example.hotel_booking_system_backend.model.request;
 
-public class AdminLoginRequest {
+// ForgotPasswordRequest.java
+public class ForgotPasswordRequest {
     private String email;
-    private String password;
-
-
-    public AdminLoginRequest() {}
-
-    public AdminLoginRequest(String email) {
-        this.email = email;
-    }
-
 
     public String getEmail() {
         return email;
@@ -20,3 +12,6 @@ public class AdminLoginRequest {
         this.email = email;
     }
 }
+
+
+

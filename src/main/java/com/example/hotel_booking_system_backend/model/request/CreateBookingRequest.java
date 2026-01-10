@@ -37,7 +37,7 @@ public class CreateBookingRequest {
     @Email(message = "Invalid email format")
     private String contactEmail;
 
-    // Getters and Setters
+
     public Long getRoomId() {
         return roomId;
     }

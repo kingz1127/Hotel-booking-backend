@@ -12,7 +12,7 @@ public class AdminResponse {
     private String role;
     private boolean active;
     private boolean emailVerified;
-    private String token; // ADD THIS FIELD
+    private String token;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime createdAt;
@@ -23,7 +23,7 @@ public class AdminResponse {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime lastLoginAt;
 
-    // Getters and Setters
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -48,13 +48,13 @@ public class AdminResponse {
     public boolean isEmailVerified() { return emailVerified; }
     public void setEmailVerified(boolean emailVerified) { this.emailVerified = emailVerified; }
 
-    // ADD PROPER TOKEN GETTER AND SETTER
+
     public String getToken() {
         return token;
     }
 
     public void setToken(String token) {
-        this.token = token; // THIS LINE WAS MISSING!
+        this.token = token;
     }
 
     public LocalDateTime getCreatedAt() { return createdAt; }

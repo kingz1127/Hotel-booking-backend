@@ -18,7 +18,7 @@ public class Rooms {
     private String roomDescription;
     private double roomDiscount;
     private double roomPrice;
-    private int roomQuantity;
+    private int roomQuantity;  // Total rooms of this type
     private String roomCategory;
     private int roomMeasurements;
     private int roomBeds;
@@ -32,17 +32,143 @@ public class Rooms {
     @JsonIgnore
     private List<Booking> bookings;
 
-    // Fix the getId() method - should return Long, not long
+    @Column(name = "available_rooms")
+    private Integer availableRooms; // Use Integer, not int
+
+    @Column(name = "is_available")
+    private Boolean isAvailable; // Use Boolean, not boolean
+
+    public Rooms() {
+        this.roomQuantity = 1;
+        this.availableRooms = 1;
+        this.isAvailable = true;
+    }
+
+    // ========== BUSINESS LOGIC METHODS ==========
+
+    /**
+     * Book one room (decrease available rooms)
+     * Returns true if booking was successful
+     */
+    public boolean bookRoom() {
+        if (this.availableRooms == null) {
+            this.availableRooms = this.roomQuantity;
+        }
+
+        if (this.availableRooms > 0) {
+            this.availableRooms -= 1;
+            updateAvailability();
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Release one room (increase available rooms)
+     * Returns true if release was successful
+     */
+    public boolean releaseRoom() {
+        if (this.availableRooms == null) {
+            this.availableRooms = 0;
+        }
+
+        if (this.availableRooms < this.roomQuantity) {
+            this.availableRooms += 1;
+            updateAvailability();
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Check if room can be booked
+     */
+    public boolean canBook() {
+        return this.isAvailable != null && this.isAvailable
+                && this.availableRooms != null && this.availableRooms > 0;
+    }
+
+    @PostLoad
+    @PrePersist
+    @PreUpdate
+    public void updateAvailability() {
+        // Handle null values
+        if (this.availableRooms == null) {
+            this.availableRooms = this.roomQuantity;
+        }
+
+        // Update availability based on available rooms
+        this.isAvailable = this.availableRooms > 0;
+
+        // Ensure available rooms doesn't exceed quantity
+        if (this.availableRooms > this.roomQuantity) {
+            this.availableRooms = this.roomQuantity;
+        }
+        if (this.availableRooms < 0) {
+            this.availableRooms = 0;
+        }
+    }
+
+    // ========== FIXED GETTERS AND SETTERS ==========
+
+    public void setRoomQuantity(int roomQuantity) {
+        this.roomQuantity = roomQuantity;
+
+        // Adjust available rooms if needed
+        if (this.availableRooms == null) {
+            this.availableRooms = roomQuantity;
+        } else if (this.availableRooms > roomQuantity) {
+            this.availableRooms = roomQuantity;
+        }
+
+        updateAvailability();
+    }
+
+    public void setAvailableRooms(Integer availableRooms) {
+        if (availableRooms == null) {
+            this.availableRooms = this.roomQuantity;
+        } else {
+            if (availableRooms < 0) {
+                this.availableRooms = 0;
+            } else if (availableRooms > this.roomQuantity) {
+                this.availableRooms = this.roomQuantity;
+            } else {
+                this.availableRooms = availableRooms;
+            }
+        }
+        updateAvailability();
+    }
+
+    // Fixed getter - returns Integer
+    public Integer getAvailableRooms() {
+        return availableRooms;
+    }
+
+    // Fixed getter - returns Boolean
+    // Add these methods to your Rooms entity
+    public Boolean getIsAvailable() {
+        return isAvailable;
+    }
+
+    // Convenience method for boolean checks
+    public boolean isAvailable() {
+        return this.isAvailable != null && this.isAvailable;
+    }
+
+    // Setter
+    public void setIsAvailable(Boolean isAvailable) {
+        this.isAvailable = isAvailable;
+    }
+
+    // ========== EXISTING GETTERS/SETTERS ==========
+
     public Long getId() {
         return id;
     }
 
-    // Fix the setId() method - should accept Long
     public void setId(Long id) {
         this.id = id;
     }
-
-    // ... keep all your other getters and setters ...
 
     public String getRoomImage() {
         return roomImage;
@@ -86,10 +212,6 @@ public class Rooms {
 
     public int getRoomQuantity() {
         return roomQuantity;
-    }
-
-    public void setRoomQuantity(int roomQuantity) {
-        this.roomQuantity = roomQuantity;
     }
 
     public double getRoomPrice() {

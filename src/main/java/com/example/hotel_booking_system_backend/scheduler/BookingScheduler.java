@@ -22,14 +22,14 @@ public class BookingScheduler {
     @Autowired
     private RoomsRepository roomsRepository;
 
-    // Run daily at 1 AM to process completed bookings
+
     @Scheduled(cron = "0 0 1 * * ?")
     @Transactional
     public void processCompletedBookings() {
         LocalDate yesterday = LocalDate.now().minusDays(1);
         System.out.println("Processing completed bookings for: " + yesterday);
 
-        // Find bookings that ended yesterday and are still in CONFIRMED or CHECKED_IN status
+
         List<Booking> completedBookings = bookingRepository.findByCheckOutDateBetween(
                 yesterday, yesterday);
 
@@ -37,10 +37,10 @@ public class BookingScheduler {
             if (booking.getStatus() == BookingStatus.CONFIRMED ||
                     booking.getStatus() == BookingStatus.CHECKED_IN) {
 
-                // Update booking status to COMPLETED
+
                 booking.setStatus(BookingStatus.COMPLETED);
 
-                // Increase room quantity
+
                 Rooms room = booking.getRoom();
                 if (room != null) {
                     room.setRoomQuantity(room.getRoomQuantity() + 1);
@@ -56,11 +56,11 @@ public class BookingScheduler {
         System.out.println("Completed processing " + completedBookings.size() + " bookings");
     }
 
-    // Run hourly to check for abandoned pending payments (older than 1 hour)
+
     @Scheduled(cron = "0 0 * * * ?")
     @Transactional
     public void cleanupAbandonedBookings() {
         System.out.println("Checking for abandoned pending payment bookings...");
-        // Add logic here if you want to auto-cancel pending payments after a certain time
+
     }
 }
