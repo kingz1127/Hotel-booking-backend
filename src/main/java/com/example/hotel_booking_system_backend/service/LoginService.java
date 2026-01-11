@@ -22,9 +22,9 @@ public class LoginService {
         List<UserRegister> allUsers = registerRepository.findAll();
         if (allUsers.isEmpty()) {
             System.out.println("DATABASE IS EMPTY! No users found.");
-            System.out.println("User needs to register first!");
+
         } else {
-            System.out.println("All users in database:");
+
             for (UserRegister user : allUsers) {
                 System.out.println("  - ID: " + user.getId() +
                         ", Email: '" + user.getEmail() + "'" +
@@ -38,36 +38,27 @@ public class LoginService {
 
             for (UserRegister user : allUsers) {
                 if (user.getEmail().equalsIgnoreCase(loginRequest.getEmail())) {
-                    System.out.println("Found with case-insensitive: " + user.getEmail());
-                    userOptional = Optional.of(user);
+                     userOptional = Optional.of(user);
                     break;
                 }
             }
         }
             if (userOptional.isPresent()) {
                 UserRegister user = userOptional.get();
-//                System.out.println("Found user details:");
-//                System.out.println("  Email in DB: '" + user.getEmail() + "'");
-//                System.out.println("  Password in DB: '" + user.getPassword() + "'");
-//                System.out.println("  Password length in DB: " + user.getPassword().length());
-//                System.out.println("  Password provided: '" + loginRequest.getPassword() + "'");
-//                System.out.println("  Password provided length: " + loginRequest.getPassword().length());
 
                 boolean passwordMatches = user.getPassword().equals(loginRequest.getPassword());
-                System.out.println("Password match result: " + passwordMatches);
-
                 if (!passwordMatches) {
 
-                    System.out.println("=== PASSWORD DEBUG ===");
+
                     String dbPass = user.getPassword();
                     String providedPass = loginRequest.getPassword();
 
-                    System.out.println("DB Password chars:");
+
                     for (int i = 0; i < dbPass.length(); i++) {
                         System.out.println("  [" + i + "]: '" + dbPass.charAt(i) + "' (code: " + (int) dbPass.charAt(i) + ")");
                     }
 
-                    System.out.println("Provided Password chars:");
+
                     for (int i = 0; i < providedPass.length(); i++) {
                         System.out.println("  [" + i + "]: '" + providedPass.charAt(i) + "' (code: " + (int) providedPass.charAt(i) + ")");
                     }
@@ -82,13 +73,13 @@ public class LoginService {
                 }
 
                 if (passwordMatches) {
-                    System.out.println("=== AUTHENTICATION SUCCESS ===");
+
                     return user;
                 }
 
             }
 
-            System.out.println("=== AUTHENTICATION FAILED ===");
+
             throw new RuntimeException("Invalid email or password");
         }
 

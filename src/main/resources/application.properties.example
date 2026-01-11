@@ -6,7 +6,7 @@ server.port=8080
 server.servlet.context-path=/
 
 # H2 Database Configuration
-spring.datasource.url=jdbc:h2:mem:hoteldb
+spring.datasource.url=jdbc:h2:mem:hoteldb2
 spring.datasource.driverClassName=org.h2.Driver
 spring.datasource.username=sa
 spring.datasource.password=

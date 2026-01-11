@@ -27,8 +27,6 @@ public class BookingDTO {
     private boolean isWalkIn;
     private String bookedByAdminName;
 
-
-    // ✅ ADD THESE NEW FIELDS
     private LocalDate actualCheckInDate;
     private LocalDate actualCheckOutDate;
     private Integer roomAvailableRooms;
@@ -45,11 +43,11 @@ public class BookingDTO {
     private Double discountedPrice;
     private boolean bookedByAdmin;
 
-    // Constructors
+
     public BookingDTO() {
     }
 
-    // Getters and Setters
+
     public Long getId() {
         return id;
     }
@@ -218,7 +216,7 @@ public class BookingDTO {
         this.bookedByAdminName = bookedByAdminName;
     }
 
-    // ✅ NEW GETTERS AND SETTERS
+
     public LocalDate getActualCheckInDate() {
         return actualCheckInDate;
     }
@@ -339,7 +337,7 @@ public class BookingDTO {
         this.bookedByAdmin = bookedByAdmin;
     }
 
-    // ✅ HELPER METHODS
+
     public boolean hasActualCheckIn() {
         return actualCheckInDate != null;
     }

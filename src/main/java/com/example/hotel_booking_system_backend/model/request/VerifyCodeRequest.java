@@ -1,6 +1,6 @@
 package com.example.hotel_booking_system_backend.model.request;
 
-// VerifyCodeRequest.java
+
 public class VerifyCodeRequest {
     private String email;
     private String code;

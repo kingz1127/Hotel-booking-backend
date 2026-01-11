@@ -121,7 +121,6 @@ public class AdminServiceImpl implements AdminService {
 
 
         AdminResponse response = convertToResponse(admin);
-        // MAKE SURE TO SET THE TOKEN
         response.setToken(token);
 
 
@@ -202,7 +201,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     private String generateSimpleToken(Admin admin) {
-        // This is a simplified token - in production, use JWT library (io.jsonwebtoken:jjwt)
+
         return "admin_" + admin.getId() + "_" + System.currentTimeMillis();
     }
 

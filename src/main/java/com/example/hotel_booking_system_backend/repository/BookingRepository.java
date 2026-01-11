@@ -34,7 +34,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
                          @Param("checkInDate") LocalDate checkInDate,
                          @Param("checkOutDate") LocalDate checkOutDate);
 
-    // Find upcoming bookings for a user
+
     @Query("SELECT b FROM Booking b WHERE b.user.id = :userId AND b.checkInDate >= CURRENT_DATE ORDER BY b.checkInDate ASC")
     List<Booking> findUpcomingBookingsByUserId(@Param("userId") Long userId);
 
@@ -71,10 +71,6 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
                                             @Param("checkInDate") LocalDate checkInDate,
                                             @Param("checkOutDate") LocalDate checkOutDate);
 
-
-//    List<Booking> findByIsWalkIn(Boolean isWalkIn);
-
-    // Find overlapping bookings for room number assignment
     @Query("SELECT b FROM Booking b WHERE b.room.id = :roomId " +
             "AND b.status NOT IN ('CANCELLED', 'COMPLETED') " +
             "AND ((b.checkInDate <= :checkOutDate AND b.checkOutDate >= :checkInDate))")
@@ -84,10 +80,24 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             @Param("checkOutDate") LocalDate checkOutDate
     );
 
-    // In BookingRepository.java:
+
     @Query("SELECT b FROM Booking b WHERE b.isWalkIn = :isWalkIn")
     List<Booking> findByIsWalkIn(@Param("isWalkIn") Boolean isWalkIn);
 
 
     Optional<Object> findByStatusIn(List<BookingStatus> revenueStatuses);
+
+    @Query("SELECT b FROM Booking b WHERE b.room.id = :roomId " +
+            "AND (b.checkInDate < :checkOut AND b.checkOutDate > :checkIn)")
+    List<Booking> findOverlappingBookings(
+            @Param("roomId") Long roomId,
+            @Param("checkIn") LocalDate checkIn,
+            @Param("checkOut") LocalDate checkOut
+    );
+
+    @Query("SELECT b FROM Booking b WHERE b.customerEmail = :email")
+    List<Booking> findByCustomerEmail(@Param("email") String email);
+
+    @Query("SELECT b FROM Booking b WHERE b.customerPhone = :phone")
+    List<Booking> findByCustomerPhone(@Param("phone") String phone);
 }

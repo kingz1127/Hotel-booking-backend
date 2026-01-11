@@ -130,7 +130,7 @@ public class Admin {
         this.verificationCode = verificationCode;
     }
 
-    // FIXED: Consistent naming for code expiration - matches service usage
+
     public LocalDateTime getCodeExpiredAt() {
         return codeExpiredAt;
     }

@@ -1,6 +1,6 @@
 package com.example.hotel_booking_system_backend.model.request;
 
-// ForgotPasswordRequest.java
+
 public class ForgotPasswordRequest {
     private String email;
 

@@ -23,7 +23,7 @@ public class SuperAdminController {
         String username = credentials.get("username");
         String password = credentials.get("password");
 
-        // Validate super admin credentials
+
         boolean isValid = superAdminService.validateSuperAdmin(username, password);
 
         if (!isValid) {

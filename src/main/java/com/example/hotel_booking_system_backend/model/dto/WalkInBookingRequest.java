@@ -23,7 +23,7 @@ public class WalkInBookingRequest {
     private Double originalPrice;
     private Double discountedPrice;
 
-    // Getters and Setters
+
     public Long getRoomId() { return roomId; }
     public void setRoomId(Long roomId) { this.roomId = roomId; }
 

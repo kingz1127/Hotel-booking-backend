@@ -18,16 +18,7 @@ public class RoomNumberService {
     @Autowired
     private BookingRepository bookingRepository;
 
-    /**
-     * Get available room numbers for a specific room category and dates
-     * Room number ranges by category:
-     * - Standard: 100-199
-     * - Deluxe: 200-299
-     * - Suite: 300-399
-     * - Presidential: 400-499
-     * - Family: 500-599
-     * - Executive: 600-699
-     */
+
     public List<String> getAvailableRoomNumbers(
             Rooms room,
             LocalDate checkInDate,
@@ -38,18 +29,15 @@ public class RoomNumberService {
         int startRange = getCategoryStartRange(category);
         int endRange = startRange + 99;
 
-        // Get all bookings for this room that overlap with requested dates
-        List<Booking> overlappingBookings = bookingRepository
+          List<Booking> overlappingBookings = bookingRepository
                 .findOverlappingBookingsForRoom(room.getId(), checkInDate, checkOutDate);
 
-        // Get room numbers already assigned
         Set<String> assignedRoomNumbers = overlappingBookings.stream()
                 .map(Booking::getAssignedRoomNumber)
                 .filter(roomNum -> roomNum != null && !roomNum.isEmpty())
                 .collect(Collectors.toSet());
 
-        // Generate available room numbers
-        List<String> availableNumbers = new ArrayList<>();
+       List<String> availableNumbers = new ArrayList<>();
         for (int i = startRange; i <= endRange && availableNumbers.size() < requestedQuantity; i++) {
             String roomNumber = String.valueOf(i);
             if (!assignedRoomNumbers.contains(roomNumber)) {
@@ -60,9 +48,7 @@ public class RoomNumberService {
         return availableNumbers;
     }
 
-    /**
-     * Suggest a single room number for a booking
-     */
+
     public String suggestRoomNumber(
             Rooms room,
             LocalDate checkInDate,
@@ -89,13 +75,9 @@ public class RoomNumberService {
             case "EXECUTIVE":
                 return 600;
             default:
-                return 100; // Default to standard range
-        }
+                return 100;      }
     }
 
-    /**
-     * Get the category name from a room number
-     */
     public String getCategoryFromRoomNumber(String roomNumber) {
         try {
             int number = Integer.parseInt(roomNumber);

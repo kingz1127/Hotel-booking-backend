@@ -18,7 +18,7 @@ public class Rooms {
     private String roomDescription;
     private double roomDiscount;
     private double roomPrice;
-    private int roomQuantity;  // Total rooms of this type
+    private int roomQuantity;
     private String roomCategory;
     private int roomMeasurements;
     private int roomBeds;
@@ -33,10 +33,10 @@ public class Rooms {
     private List<Booking> bookings;
 
     @Column(name = "available_rooms")
-    private Integer availableRooms; // Use Integer, not int
+    private Integer availableRooms;
 
     @Column(name = "is_available")
-    private Boolean isAvailable; // Use Boolean, not boolean
+    private Boolean isAvailable;
 
     public Rooms() {
         this.roomQuantity = 1;
@@ -44,12 +44,7 @@ public class Rooms {
         this.isAvailable = true;
     }
 
-    // ========== BUSINESS LOGIC METHODS ==========
 
-    /**
-     * Book one room (decrease available rooms)
-     * Returns true if booking was successful
-     */
     public boolean bookRoom() {
         if (this.availableRooms == null) {
             this.availableRooms = this.roomQuantity;
@@ -58,15 +53,14 @@ public class Rooms {
         if (this.availableRooms > 0) {
             this.availableRooms -= 1;
             updateAvailability();
+
             return true;
         }
+
         return false;
     }
 
-    /**
-     * Release one room (increase available rooms)
-     * Returns true if release was successful
-     */
+
     public boolean releaseRoom() {
         if (this.availableRooms == null) {
             this.availableRooms = 0;
@@ -75,14 +69,13 @@ public class Rooms {
         if (this.availableRooms < this.roomQuantity) {
             this.availableRooms += 1;
             updateAvailability();
+
             return true;
         }
+
         return false;
     }
 
-    /**
-     * Check if room can be booked
-     */
     public boolean canBook() {
         return this.isAvailable != null && this.isAvailable
                 && this.availableRooms != null && this.availableRooms > 0;
@@ -92,15 +85,15 @@ public class Rooms {
     @PrePersist
     @PreUpdate
     public void updateAvailability() {
-        // Handle null values
+
         if (this.availableRooms == null) {
             this.availableRooms = this.roomQuantity;
         }
 
-        // Update availability based on available rooms
+
         this.isAvailable = this.availableRooms > 0;
 
-        // Ensure available rooms doesn't exceed quantity
+
         if (this.availableRooms > this.roomQuantity) {
             this.availableRooms = this.roomQuantity;
         }
@@ -109,12 +102,12 @@ public class Rooms {
         }
     }
 
-    // ========== FIXED GETTERS AND SETTERS ==========
+
 
     public void setRoomQuantity(int roomQuantity) {
         this.roomQuantity = roomQuantity;
 
-        // Adjust available rooms if needed
+
         if (this.availableRooms == null) {
             this.availableRooms = roomQuantity;
         } else if (this.availableRooms > roomQuantity) {
@@ -139,28 +132,27 @@ public class Rooms {
         updateAvailability();
     }
 
-    // Fixed getter - returns Integer
+
     public Integer getAvailableRooms() {
         return availableRooms;
     }
 
-    // Fixed getter - returns Boolean
-    // Add these methods to your Rooms entity
+
     public Boolean getIsAvailable() {
         return isAvailable;
     }
 
-    // Convenience method for boolean checks
+
     public boolean isAvailable() {
         return this.isAvailable != null && this.isAvailable;
     }
 
-    // Setter
+
     public void setIsAvailable(Boolean isAvailable) {
         this.isAvailable = isAvailable;
     }
 
-    // ========== EXISTING GETTERS/SETTERS ==========
+
 
     public Long getId() {
         return id;

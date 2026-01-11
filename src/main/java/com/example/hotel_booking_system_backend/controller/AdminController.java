@@ -70,7 +70,7 @@ public class AdminController {
             AdminResponse response = adminService.verifyLoginCode(request.getEmail(), request.getCode());
             return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
-            // Handle invalid/expired codes
+
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
@@ -132,7 +132,7 @@ public class AdminController {
     @PostMapping("/admin/fix-walkin-accounts")
     public ResponseEntity<?> fixWalkInAccounts() {
         try {
-            // Get all walk-in bookings without user accounts
+
             List<Booking> walkInBookings = bookingRepository.findAll().stream()
                     .filter(b -> b.getIsWalkIn() && b.getUser() == null &&
                             b.getCustomerEmail() != null && !b.getCustomerEmail().trim().isEmpty())
@@ -144,17 +144,17 @@ public class AdminController {
             for (Booking booking : walkInBookings) {
                 String email = booking.getCustomerEmail().trim();
 
-                // Check if user already exists
+
                 Optional<UserRegister> existingUser = registerRepository.findByEmail(email);
 
                 if (existingUser.isPresent()) {
-                    // Link to existing user
+
                     booking.setUser(existingUser.get());
                     bookingRepository.save(booking);
                     results.add("Linked booking #" + booking.getId() + " to existing user: " + email);
                     fixed++;
                 } else {
-                    // Create new user account
+
                     UserRegister newUser = new UserRegister();
                     newUser.setFullName(booking.getCustomerName());
                     newUser.setEmail(email);
@@ -167,7 +167,7 @@ public class AdminController {
 
                     UserRegister savedUser = registerRepository.save(newUser);
 
-                    // Link booking to new user
+
                     booking.setUser(savedUser);
                     bookingRepository.save(booking);
 

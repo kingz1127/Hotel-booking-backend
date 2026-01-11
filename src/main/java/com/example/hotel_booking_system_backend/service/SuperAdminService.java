@@ -25,7 +25,7 @@ public class SuperAdminService {
         return "super-admin-token-" + username + "-" + System.currentTimeMillis();
     }
 
-    // Get system statistics
+
     public Map<String, Object> getSystemStats() {
         Map<String, Object> stats = new HashMap<>();
 

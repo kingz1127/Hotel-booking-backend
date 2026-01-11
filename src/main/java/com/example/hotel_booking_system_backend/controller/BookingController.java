@@ -5,7 +5,7 @@ import com.example.hotel_booking_system_backend.model.dto.WalkInBookingRequest;
 import com.example.hotel_booking_system_backend.model.entity.Admin;
 import com.example.hotel_booking_system_backend.model.entity.Booking;
 import com.example.hotel_booking_system_backend.model.entity.BookingStatus;
-//import com.example.hotel_booking_system_backend.model.entity.WalkInBookingRequest;
+
 import com.example.hotel_booking_system_backend.model.request.CreateBookingRequest;
 import com.example.hotel_booking_system_backend.model.response.AdminResponse;
 import com.example.hotel_booking_system_backend.service.AdminService;
@@ -18,7 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-// Add these imports at the top of your BookingController.java
+
 import com.example.hotel_booking_system_backend.model.entity.Rooms;
 import com.example.hotel_booking_system_backend.repository.RoomsRepository;
 import com.example.hotel_booking_system_backend.repository.BookingRepository;
@@ -292,7 +292,7 @@ public class BookingController {
             System.out.println("=== WALK-IN BOOKING REQUEST ===");
             System.out.println("Auth Header: " + authHeader);
 
-            // Extract token
+
             String token = authHeader != null ? authHeader.replace("Bearer ", "") : null;
 
             if (token == null || !token.startsWith("admin_")) {
@@ -300,7 +300,6 @@ public class BookingController {
                         .body(Map.of("error", "Admin authentication required"));
             }
 
-            // Extract admin ID from token
             String[] tokenParts = token.split("_");
             if (tokenParts.length < 2) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -316,15 +315,15 @@ public class BookingController {
                         .body(Map.of("error", "Invalid admin ID in token"));
             }
 
-            // ✅ Use the correct method name
+
             Optional<Admin> adminOpt = adminService.findById(adminId);
 
             if (!adminOpt.isPresent()) {
                 System.out.println("Admin not found for ID: " + adminId);
 
-                // DEBUG: List all admins
+
                 List<AdminResponse> allAdmins = adminService.getAllAdmins();
-                System.out.println("All admins in system:");
+
                 for (AdminResponse a : allAdmins) {
                     System.out.println("  Admin ID: " + a.getId() + ", Email: " + a.getEmail());
                 }
@@ -334,9 +333,9 @@ public class BookingController {
             }
 
             Admin admin = adminOpt.get();
-            System.out.println("Found admin: " + admin.getEmail());
 
-            // Create booking
+
+
             BookingDTO booking = bookingService.createWalkInBooking(request, admin);
 
             return ResponseEntity.ok(booking);
@@ -351,9 +350,7 @@ public class BookingController {
     @PatchMapping("/{bookingId}/checkin")
     public ResponseEntity<?> checkinBooking(@PathVariable Long bookingId) {
         try {
-            System.out.println("=== PROCESSING MANUAL CHECK-IN ===");
 
-            // Use the new processManualCheckin method from BookingService
             BookingDTO bookingDTO = bookingService.processManualCheckin(bookingId);
 
             return ResponseEntity.ok(Map.of(
@@ -372,13 +369,10 @@ public class BookingController {
         }
     }
 
-    // ✅ ADDED: Manual checkout endpoint
     @PatchMapping("/{bookingId}/checkout")
     public ResponseEntity<?> checkoutBooking(@PathVariable Long bookingId) {
         try {
-            System.out.println("=== PROCESSING MANUAL CHECKOUT ===");
 
-            // Use the new processManualCheckout method from BookingService
             BookingDTO bookingDTO = bookingService.processManualCheckout(bookingId);
 
             return ResponseEntity.ok(Map.of(
@@ -397,7 +391,7 @@ public class BookingController {
         }
     }
 
-    // ✅ ADDED: Revenue statistics endpoint
+
     @GetMapping("/stats/revenue")
     public ResponseEntity<?> getRevenueStats() {
         try {
@@ -421,15 +415,11 @@ public class BookingController {
     @PostMapping("/emergency-fix-room/{roomId}")
     public ResponseEntity<?> emergencyFixRoomAvailability(@PathVariable Long roomId) {
         try {
-            System.out.println("=== EMERGENCY FIX FOR ROOM #" + roomId + " ===");
-
-            // First, check if the room has currently active bookings
-            System.out.println("📋 Checking if room #" + roomId + " is currently occupied...");
 
             List<Booking> activeBookings = bookingRepository.findActiveBookingsByRoomId(roomId);
             LocalDate today = LocalDate.now();
 
-            // Check for bookings that are currently active AND ongoing
+
             List<Booking> currentlyActiveBookings = activeBookings.stream()
                     .filter(b -> {
                         boolean isActiveStatus = (b.getStatus() == BookingStatus.CONFIRMED ||
@@ -440,7 +430,6 @@ public class BookingController {
                     .collect(Collectors.toList());
 
             if (!currentlyActiveBookings.isEmpty()) {
-                System.out.println("❌ CANNOT FIX: Room is currently occupied by " + currentlyActiveBookings.size() + " booking(s)");
 
                 Booking activeBooking = currentlyActiveBookings.get(0);
                 String errorMessage = String.format(
@@ -465,22 +454,13 @@ public class BookingController {
                 ));
             }
 
-            System.out.println("✅ Room #" + roomId + " is not currently occupied. Proceeding with fix...");
-
             Rooms room = roomsRepository.findById(roomId)
                     .orElseThrow(() -> new RuntimeException("Room not found with id: " + roomId));
 
-            System.out.println("Room: " + room.getRoomName());
-            System.out.println("Before fix:");
-            System.out.println("  Total Rooms: " + room.getRoomQuantity());
-            System.out.println("  Available Rooms: " + room.getAvailableRooms());
-            System.out.println("  Is Available: " + room.getIsAvailable());
+
 
             List<Booking> allBookings = bookingRepository.findByRoomId(roomId);
-            System.out.println("Total bookings for this room: " + allBookings.size());
 
-            // ✅ CRITICAL FIX: Only count bookings that are CURRENTLY ACTIVE AND ONGOING
-            // Active = (CONFIRMED or CHECKED_IN) AND checkout date hasn't passed yet
             long activeOngoingBookings = allBookings.stream()
                     .filter(b -> {
                         boolean isActiveStatus = (b.getStatus() == BookingStatus.CONFIRMED ||
@@ -493,10 +473,7 @@ public class BookingController {
                             " - CheckOut: " + b.getCheckOutDate()))
                     .count();
 
-            System.out.println("Active ongoing bookings: " + activeOngoingBookings);
 
-            // Print all bookings for debugging
-            System.out.println("All bookings:");
             for (Booking booking : allBookings) {
                 boolean isPast = booking.getCheckOutDate().isBefore(today);
                 System.out.println("  Booking #" + booking.getId() +
@@ -505,16 +482,13 @@ public class BookingController {
                         " - Past: " + isPast);
             }
 
-            // Calculate correct availability
+
             int correctAvailability = room.getRoomQuantity() - (int)activeOngoingBookings;
             correctAvailability = Math.max(0, correctAvailability);
 
-            System.out.println("Correct availability should be: " + correctAvailability);
 
-            // Only fix if availability is incorrect
             if (room.getAvailableRooms() == correctAvailability) {
-                System.out.println("⚠️ Room availability is already correct. No fix needed.");
-                return ResponseEntity.ok(Map.of(
+                  return ResponseEntity.ok(Map.of(
                         "success", true,
                         "roomId", roomId,
                         "roomName", room.getRoomName(),
@@ -527,16 +501,10 @@ public class BookingController {
                 ));
             }
 
-            // Update the room
             int oldAvailable = room.getAvailableRooms();
             room.setAvailableRooms(correctAvailability);
             room.setIsAvailable(correctAvailability > 0);
             Rooms savedRoom = roomsRepository.save(room);
-
-            System.out.println("✅ Room fixed successfully!");
-            System.out.println("After fix:");
-            System.out.println("  Available Rooms: " + savedRoom.getAvailableRooms());
-            System.out.println("  Is Available: " + savedRoom.getIsAvailable());
 
             return ResponseEntity.ok(Map.of(
                     "success", true,
@@ -552,8 +520,7 @@ public class BookingController {
             ));
 
         } catch (Exception e) {
-            System.err.println("❌ Emergency fix failed: " + e.getMessage());
-            e.printStackTrace();
+             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
                     "success", false,
                     "error", e.getMessage()
@@ -561,19 +528,15 @@ public class BookingController {
         }
     }
 
-
-    // ✅ FIXED DIAGNOSTIC ENDPOINT - Replace the diagnoseRoomAvailability method
     @GetMapping("/diagnose-room/{roomId}")
     public ResponseEntity<?> diagnoseRoomAvailability(@PathVariable Long roomId) {
         try {
-            System.out.println("=== DIAGNOSING ROOM #" + roomId + " ===");
 
             Rooms room = roomsRepository.findById(roomId)
                     .orElseThrow(() -> new RuntimeException("Room not found with id: " + roomId));
 
             List<Booking> allBookings = bookingRepository.findByRoomId(roomId);
 
-            // Group bookings by status
             Map<BookingStatus, Long> bookingsByStatus = allBookings.stream()
                     .collect(Collectors.groupingBy(Booking::getStatus, Collectors.counting()));
 
@@ -599,7 +562,7 @@ public class BookingController {
             int calculatedAvailability = room.getRoomQuantity() - (int)activeCount;
             boolean needsFix = room.getAvailableRooms() != calculatedAvailability;
 
-            // ✅ FIX: Use HashMap instead of Map.of() to avoid type inference issues
+
             Map<String, Object> response = new HashMap<>();
             response.put("roomId", roomId);
             response.put("roomName", room.getRoomName());
@@ -626,12 +589,9 @@ public class BookingController {
         }
     }
 
-    // ✅ ALSO FIX: The emergency-fix-all-rooms endpoint
     @PostMapping("/emergency-fix-all-rooms")
     public ResponseEntity<?> emergencyFixAllRooms() {
         try {
-            System.out.println("=== EMERGENCY FIX FOR ALL ROOMS ===");
-
             List<Rooms> allRooms = roomsRepository.findAll();
             List<Map<String, Object>> results = new ArrayList<>();
             List<Map<String, Object>> skippedRooms = new ArrayList<>();
@@ -644,7 +604,7 @@ public class BookingController {
             for (Rooms room : allRooms) {
                 System.out.println("Processing room: " + room.getRoomName() + " (ID: " + room.getId() + ")");
 
-                // Check if room has active ongoing bookings
+
                 List<Booking> activeBookings = bookingRepository.findActiveBookingsByRoomId(room.getId());
                 boolean isCurrentlyOccupied = activeBookings.stream()
                         .anyMatch(b -> {
@@ -655,7 +615,7 @@ public class BookingController {
                         });
 
                 if (isCurrentlyOccupied) {
-                    System.out.println("  ⚠️ Skipping - Room is currently occupied");
+
                     skippedCount++;
 
                     Map<String, Object> skippedRoom = new HashMap<>();
@@ -668,7 +628,6 @@ public class BookingController {
 
                 List<Booking> bookings = bookingRepository.findByRoomId(room.getId());
 
-                // Count active ongoing bookings
                 long activeOngoingBookings = bookings.stream()
                         .filter(b -> {
                             boolean isActiveStatus = (b.getStatus() == BookingStatus.CONFIRMED ||
@@ -695,12 +654,11 @@ public class BookingController {
                     result.put("status", "already_correct");
                     alreadyCorrectCount++;
                 } else {
-                    // Fix the room
+
                     room.setAvailableRooms(correctAvailability);
                     room.setIsAvailable(correctAvailability > 0);
                     roomsRepository.save(room);
 
-                    System.out.println("  ✅ Fixed - Old: " + oldAvailable + " → New: " + correctAvailability);
                     result.put("fixed", true);
                     result.put("status", "fixed");
                     fixedCount++;
@@ -730,8 +688,7 @@ public class BookingController {
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {
-            System.err.println("❌ Emergency fix all failed: " + e.getMessage());
-            e.printStackTrace();
+             e.printStackTrace();
 
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("success", false);
@@ -740,7 +697,6 @@ public class BookingController {
         }
     }
 
-    // Add this method to your BookingController.java
     @GetMapping("/room/{roomId}/active")
     public ResponseEntity<?> getActiveBookingsForRoom(@PathVariable Long roomId) {
         try {
@@ -752,22 +708,19 @@ public class BookingController {
             List<Booking> activeBookings = bookingRepository.findActiveBookingsByRoomId(roomId);
             LocalDate today = LocalDate.now();
 
-            // Filter to only include bookings that are currently active
+
             List<Booking> currentActiveBookings = activeBookings.stream()
                     .filter(b -> {
                         boolean isActiveStatus = (b.getStatus() == BookingStatus.CONFIRMED ||
                                 b.getStatus() == BookingStatus.CHECKED_IN);
 
-                        // Check if booking is ongoing (check-out date hasn't passed yet)
                         boolean isOngoing = !b.getCheckOutDate().isBefore(today);
 
                         return isActiveStatus && isOngoing;
                     })
                     .collect(Collectors.toList());
 
-            System.out.println("Found " + currentActiveBookings.size() + " currently active bookings for room #" + roomId);
 
-            // Convert to response DTO
             List<Map<String, Object>> bookingDetails = currentActiveBookings.stream()
                     .map(b -> {
                         Map<String, Object> detail = new HashMap<>();
@@ -794,7 +747,6 @@ public class BookingController {
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {
-            System.err.println("Error checking active bookings: " + e.getMessage());
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", e.getMessage()));

@@ -37,17 +37,14 @@ public class PasswordResetService {
 
         UserRegister user = userOpt.get();
 
-        // Check if it's a walk-in customer with default password
+
         boolean isWalkInCustomer = user.getPassword() != null &&
                 user.getPassword().startsWith("WALKIN_");
 
-        // Delete any existing tokens for this user
         tokenRepository.deleteByUser(user);
 
-        // Generate 4-digit code
         String code = generateCode();
 
-        // Create and save token
         PasswordResetToken token = new PasswordResetToken();
         token.setUser(user);
         token.setCode(code);
@@ -55,8 +52,7 @@ public class PasswordResetService {
         token.setUsed(false);
         tokenRepository.save(token);
 
-        // Send email with appropriate message
-        if (isWalkInCustomer) {
+       if (isWalkInCustomer) {
             emailService.sendWalkInPasswordSetup(email, code, user.getFullName());
         } else {
             emailService.sendPasswordResetCode(email, code, user.getFullName());
@@ -79,8 +75,7 @@ public class PasswordResetService {
 
         PasswordResetToken token = tokenOpt.get();
 
-        // Check if token is expired or used
-        if (token.isUsed() || token.getExpiryDate().isBefore(LocalDateTime.now())) {
+       if (token.isUsed() || token.getExpiryDate().isBefore(LocalDateTime.now())) {
             return false;
         }
 
@@ -104,8 +99,7 @@ public class PasswordResetService {
 
         PasswordResetToken token = tokenOpt.get();
 
-        // Check if token is expired or used
-        if (token.isUsed()) {
+     if (token.isUsed()) {
             throw new RuntimeException("This reset code has already been used");
         }
 
@@ -113,21 +107,19 @@ public class PasswordResetService {
             throw new RuntimeException("Reset code has expired");
         }
 
-        // Update password
         user.setPassword(newPassword);
 
-        // If this was a walk-in customer, activate their account
         if (user.getPassword() != null && user.getPassword().startsWith("WALKIN_")) {
             user.setIsActive(true);
         }
 
         registerRepository.save(user);
 
-        // Mark token as used
+
         token.setUsed(true);
         tokenRepository.save(token);
 
-        // Delete all tokens for this user
+
         tokenRepository.deleteByUser(user);
     }
 

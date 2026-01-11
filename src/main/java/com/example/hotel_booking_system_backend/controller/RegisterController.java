@@ -39,9 +39,7 @@ public class RegisterController {
         return registerService.getAllUsers();
     }
 
-    // Add this method to your RegisterController
 
-    // Add this method to your RegisterController
 
     @GetMapping("/check-email")
     public ResponseEntity<?> checkEmailExists(@RequestParam String email) {
@@ -51,7 +49,7 @@ public class RegisterController {
             if (existingUser.isPresent()) {
                 UserRegister user = existingUser.get();
 
-                // Check if it's a walk-in customer (has default password pattern)
+
                 boolean isWalkIn = user.getPassword() != null &&
                         user.getPassword().startsWith("WALKIN_");
 

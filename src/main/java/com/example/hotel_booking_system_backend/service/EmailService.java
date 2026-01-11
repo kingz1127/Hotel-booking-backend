@@ -529,4 +529,97 @@ public class EmailService {
             throw new RuntimeException("Failed to send booking confirmation email", e);
         }
     }
+
+    // Add this method to EmailService.java
+    public void sendCustomerWelcomeEmail(String toEmail, String customerName, String verificationCode) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setTo(toEmail);
+            helper.setSubject("Welcome to Our Hotel - Set Up Your Account");
+
+            String htmlContent = buildCustomerWelcomeEmail(customerName, verificationCode, toEmail);
+            helper.setText(htmlContent, true);
+
+            mailSender.send(message);
+            System.out.println("✅ Welcome email sent to: " + toEmail);
+        } catch (MessagingException e) {
+            System.err.println("❌ Failed to send welcome email to " + toEmail + ": " + e.getMessage());
+            throw new RuntimeException("Failed to send welcome email", e);
+        }
+    }
+
+    private String buildCustomerWelcomeEmail(String customerName, String code, String email) {
+        return """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: linear-gradient(135deg, #4CAF50, #45a049); color: white; padding: 30px 20px; text-align: center; border-radius: 10px 10px 0 0; }
+            .content { background: white; padding: 30px; border-radius: 0 0 10px 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+            .code { font-size: 32px; font-weight: bold; letter-spacing: 5px; text-align: center; background: #f8f9fa; padding: 20px; border: 2px dashed #4CAF50; margin: 30px 0; border-radius: 8px; color: #333; }
+            .info-box { background: #e8f5e9; border-left: 4px solid #4CAF50; padding: 15px; margin: 20px 0; border-radius: 4px; }
+            .footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; color: #666; font-size: 12px; text-align: center; }
+            .steps { margin: 20px 0; padding-left: 20px; }
+            .steps li { margin-bottom: 10px; }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>Welcome to Our Hotel!</h1>
+            </div>
+            <div class="content">
+                <p>Dear <strong>%s</strong>,</p>
+                
+                <p>Thank you for your recent walk-in booking! We've created a customer account for you to manage your bookings.</p>
+                
+                <div class="info-box">
+                    <p><strong>Your account gives you:</strong></p>
+                    <ul>
+                        <li>Full access to view your booking history</li>
+                        <li>Ability to manage your profile</li>
+                        <li>Quick rebooking for future stays</li>
+                        <li>Special offers and loyalty rewards</li>
+                    </ul>
+                </div>
+                
+                <p>To activate your account, use this verification code:</p>
+                
+                <div class="code">%s</div>
+                
+                <p><strong>This code will expire in 15 minutes.</strong></p>
+                
+                <p>To set up your account password:</p>
+                <ol class="steps">
+                    <li>Go to our website's login page</li>
+                    <li>Click on "Forgot Password"</li>
+                    <li>Enter your email address: <strong>%s</strong></li>
+                    <li>Enter the verification code above</li>
+                    <li>Create a secure password for your account</li>
+                </ol>
+                
+                <p>Once your account is set up, you can:</p>
+                <ul>
+                    <li>View all your current and past bookings</li>
+                    <li>Update your contact information</li>
+                    <li>Receive exclusive member offers</li>
+                    <li>Book future stays faster</li>
+                </ul>
+                
+                <div class="footer">
+                    <p>Best regards,<br>
+                    <strong>Hotel Management Team</strong></p>
+                    <p>© %d Hotel. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </body>
+    </html>
+    """.formatted(customerName, code, email, java.time.Year.now().getValue());
+    }
 }

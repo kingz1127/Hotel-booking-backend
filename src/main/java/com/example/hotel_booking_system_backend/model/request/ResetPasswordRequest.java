@@ -1,6 +1,6 @@
 package com.example.hotel_booking_system_backend.model.request;
 
-// ResetPasswordRequest.java
+
 public class ResetPasswordRequest {
     private String email;
     private String code;

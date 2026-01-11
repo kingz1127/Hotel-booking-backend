@@ -33,9 +33,9 @@ public class JwtService {
 
     private Claims extractAllClaims(String token) {
         return Jwts.parser()
-                .verifyWith(getSigningKey())  // Changed from parserBuilder() in 0.12.0+
+                .verifyWith(getSigningKey())
                 .build()
-                .parseSignedClaims(token)      // Changed from parseClaimsJws() in 0.12.0+
-                .getPayload();                 // Changed from getBody() in 0.12.0+
+                .parseSignedClaims(token)
+                .getPayload();
     }
 }
