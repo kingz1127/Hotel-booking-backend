@@ -121,6 +121,8 @@ public class BookingService {
         return convertToDTO(savedBooking);
     }
 
+    // Replace the createBooking() method in BookingService.java
+
     @Transactional
     public BookingDTO createBooking(CreateBookingRequest request) {
         if (request.getCheckInDate().isAfter(request.getCheckOutDate()) ||
@@ -131,7 +133,7 @@ public class BookingService {
         Rooms room = roomsRepository.findById(request.getRoomId())
                 .orElseThrow(() -> new RuntimeException("Room not found with id: " + request.getRoomId()));
 
-           if (room.getAvailableRooms() <= 0) {
+        if (room.getAvailableRooms() <= 0) {
             throw new RuntimeException("Room is not available. Sold out.");
         }
 
@@ -140,7 +142,8 @@ public class BookingService {
                 request.getCheckInDate(),
                 request.getCheckOutDate()
         );
-  if (existingBookingsCount >= room.getAvailableRooms()) {
+
+        if (existingBookingsCount >= room.getAvailableRooms()) {
             int availableQuantity = (int)(room.getAvailableRooms() - existingBookingsCount);
             throw new RuntimeException(
                     String.format("Room is fully booked for the selected dates. Only %d room%s available.",
@@ -164,6 +167,26 @@ public class BookingService {
             throw new RuntimeException("Total amount calculation mismatch. Expected: " + totalAmount + ", Got: " + request.getTotalAmount());
         }
 
+        // ✅ FIX: Assign room number for online bookings too
+        List<Booking> overlappingBookings = bookingRepository.findOverlappingBookings(
+                room.getId(),
+                request.getCheckInDate(),
+                request.getCheckOutDate()
+        );
+
+        String assignedRoomNumber = findAvailableRoomNumber(
+                room,
+                request.getCheckInDate(),
+                request.getCheckOutDate(),
+                overlappingBookings
+        );
+
+        if (assignedRoomNumber == null) {
+            throw new RuntimeException(
+                    "Could not assign a specific room number. All rooms in this category are occupied."
+            );
+        }
+
         Booking booking = new Booking();
         booking.setRoom(room);
         booking.setUser(user);
@@ -175,11 +198,9 @@ public class BookingService {
         booking.setContactPhone(request.getContactPhone());
         booking.setContactEmail(request.getContactEmail());
 
-        String suggestedRoomNumber = roomNumberService.suggestRoomNumber(
-                room,
-                request.getCheckInDate(),
-                request.getCheckOutDate()
-        );
+        // ✅ NEW: Set the assigned room number
+        booking.setAssignedRoomNumber(assignedRoomNumber);
+        System.out.println("✅ Assigned room number to online booking: " + assignedRoomNumber);
 
         booking.setStatus(BookingStatus.PENDING_PAYMENT);
 
@@ -187,6 +208,73 @@ public class BookingService {
 
         return convertToDTO(savedBooking);
     }
+
+//    @Transactional
+//    public BookingDTO createBooking(CreateBookingRequest request) {
+//        if (request.getCheckInDate().isAfter(request.getCheckOutDate()) ||
+//                request.getCheckInDate().isEqual(request.getCheckOutDate())) {
+//            throw new IllegalArgumentException("Check-out date must be after check-in date");
+//        }
+//
+//        Rooms room = roomsRepository.findById(request.getRoomId())
+//                .orElseThrow(() -> new RuntimeException("Room not found with id: " + request.getRoomId()));
+//
+//           if (room.getAvailableRooms() <= 0) {
+//            throw new RuntimeException("Room is not available. Sold out.");
+//        }
+//
+//        long existingBookingsCount = bookingRepository.countActiveBookingsForRoomAndDates(
+//                request.getRoomId(),
+//                request.getCheckInDate(),
+//                request.getCheckOutDate()
+//        );
+//  if (existingBookingsCount >= room.getAvailableRooms()) {
+//            int availableQuantity = (int)(room.getAvailableRooms() - existingBookingsCount);
+//            throw new RuntimeException(
+//                    String.format("Room is fully booked for the selected dates. Only %d room%s available.",
+//                            Math.max(0, availableQuantity), Math.max(0, availableQuantity) == 1 ? "" : "s")
+//            );
+//        }
+//
+//        UserRegister user = registerRepository.findById(request.getUserId())
+//                .orElseThrow(() -> new RuntimeException("User not found with id: " + request.getUserId()));
+//
+//        long nights = ChronoUnit.DAYS.between(request.getCheckInDate(), request.getCheckOutDate());
+//
+//        double pricePerNight = room.getRoomPrice();
+//        if (room.getRoomDiscount() > 0) {
+//            pricePerNight = pricePerNight * (1 - room.getRoomDiscount() / 100.0);
+//        }
+//
+//        double totalAmount = nights * pricePerNight;
+//
+//        if (Math.abs(totalAmount - request.getTotalAmount()) > 1.0) {
+//            throw new RuntimeException("Total amount calculation mismatch. Expected: " + totalAmount + ", Got: " + request.getTotalAmount());
+//        }
+//
+//        Booking booking = new Booking();
+//        booking.setRoom(room);
+//        booking.setUser(user);
+//        booking.setCheckInDate(request.getCheckInDate());
+//        booking.setCheckOutDate(request.getCheckOutDate());
+//        booking.setNumberOfGuests(request.getNumberOfGuests());
+//        booking.setTotalAmount(totalAmount);
+//        booking.setSpecialRequests(request.getSpecialRequests());
+//        booking.setContactPhone(request.getContactPhone());
+//        booking.setContactEmail(request.getContactEmail());
+//
+//        String suggestedRoomNumber = roomNumberService.suggestRoomNumber(
+//                room,
+//                request.getCheckInDate(),
+//                request.getCheckOutDate()
+//        );
+//
+//        booking.setStatus(BookingStatus.PENDING_PAYMENT);
+//
+//        Booking savedBooking = bookingRepository.save(booking);
+//
+//        return convertToDTO(savedBooking);
+//    }
 
     public BookingDTO getBookingById(Long id) {
         Booking booking = bookingRepository.findById(id)
